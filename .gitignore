@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.egg-info/
+dist/
+build/
+*.egg
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Виртуальные окружения
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Логи
+*.log
+
+# Конфигурационные файлы
+*.env
+*.local
+*.json
+*.yml
+*.yaml
+
+# Другие временные файлы
+*.tmp
+*.bak
+*.swp
+*.swo
+*.swn
