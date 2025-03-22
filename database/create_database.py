@@ -1,46 +1,30 @@
 """В модуле создаются таблицы."""
-
+import os
 import sqlite3
 from functools import wraps
-import logging
-from colorama import Fore, Style, init
-
-# Инициализация colorama.
-# Меняет цвет логов.
-init(autoreset=True)
-
-# Настройка логирования
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler()  # Вывод в консоль
-    ]
-)
-
-logger = logging.getLogger(__name__)
+from logs.logger_config import logger
 
 
 def control_create_tables(func):
     """Логирование создания таблиц."""
     @wraps(func)
     def wrapper(*args, **kwargs):
-        logger.info(f"{Fore.GREEN}Создание таблицы: {func.__name__}")
+        logger.info(f"Создание таблицы: {func.__name__}")
         try:
             res = func(*args, **kwargs)
-            logger.info(f"{Fore.GREEN}Таблица {func.__name__} успешно создана.{Style.RESET_ALL}\n")
+            logger.info(f"Таблица {func.__name__} успешно создана.\n")
             return res
         except sqlite3.Error as e:
-            logger.warning(f"{Fore.RED}Ошибка при создании таблицы {func.__name__}: {e}\n")
+            logger.warning(f"Ошибка при создании таблицы {func.__name__}: {e}\n")
             logger.warning(f"SQL ошибка: {e.args[0]}")  # Выводим конкретную ошибку
         except Exception as e:
-            logger.warning(f"{Fore.RED}Неизвестная ошибка при создании таблицы {func.__name__}: {e}")
+            logger.error(f"Неизвестная ошибка при создании таблицы {func.__name__}: {e}")
 
     return wrapper
 
 
 @control_create_tables
-def create_departament_table(cursor):
+def create_department_table(cursor):
     """Создание таблицы подразделений/отделов."""
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS department (
@@ -55,8 +39,8 @@ def create_employee_position_table(cursor):
     CREATE TABLE IF NOT EXISTS positions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title VARCHAR(50) NOT NULL UNIQUE,
-    departament_id INTEGER NOT NULL,
-    FOREIGN KEY (departament_id) REFERENCES department(id) ON DELETE CASCADE)
+    department_id INTEGER NOT NULL,
+    FOREIGN KEY (department_id) REFERENCES department(id) ON DELETE CASCADE)
     ''')
 
 
@@ -79,10 +63,10 @@ def create_employee_table(cursor):
     name VARCHAR(250) NOT NULL,
     password VARCHAR(150),
     position_id INTEGER,
-    departament_id INTEGER NOT NULL,
+    department_id INTEGER NOT NULL,
     employee_roles_id INTEGER NOT NULL,
     FOREIGN KEY (position_id) REFERENCES positions(id),
-    FOREIGN KEY (departament_id) REFERENCES department(id),
+    FOREIGN KEY (department_id) REFERENCES department(id),
     FOREIGN KEY (employee_roles_id) REFERENCES employee_roles(id))
     ''')
 
@@ -98,10 +82,10 @@ def create_task_table(cursor):
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     closed_at DATETIME,
     deadline DATETIME,
-    departament_id INTEGER NOT NULL,
+    department_id INTEGER NOT NULL,
     employee_id INTEGER NOT NULL,
-    FOREIGN KEY (departament_id) REFERENCES departament(id),
-    FOREIGN KEY (employee_id) REFERENCES employee(id)
+    FOREIGN KEY (department_id) REFERENCES department(id),
+    FOREIGN KEY (employee_id) REFERENCES employees(id)
     )''')
 
 
@@ -116,33 +100,32 @@ def create_task_history_table(cursor):
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     closed_at DATETIME,
     deadline DATETIME,
-    departament_id INTEGER NOT NULL,
+    department_id INTEGER NOT NULL,
     employee_id INTEGER NOT NULL,
-    FOREIGN KEY (departament_id) REFERENCES departament(id),
+    FOREIGN KEY (department_id) REFERENCES department(id),
     FOREIGN KEY (employee_id) REFERENCES employee(id))''')
 
 
 def create_connection():
     """Создание соединения с базой данных, если БД не существует, тогда БД создастся."""
-    conn = sqlite3.connect("task.db")
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    db_path = os.path.join(project_root, "task.db")
+    conn = sqlite3.connect(db_path)
     return conn
 
 
 def create_tables():
     """Создание таблиц."""
     # Создаём соединение с БД
-    conn = create_connection()
-    cursor = conn.cursor()
+    with create_connection() as conn:
+        cursor = conn.cursor()
 
-    create_departament_table(cursor)
+    create_department_table(cursor)
     create_employee_position_table(cursor)
     create_employee_roles_table(cursor)
     create_employee_table(cursor)
     create_task_table(cursor)
     create_task_history_table(cursor)
-
-    conn.commit()
-    conn.close()
 
 
 if __name__ == "__main__":
