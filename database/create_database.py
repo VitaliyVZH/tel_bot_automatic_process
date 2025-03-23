@@ -2,6 +2,8 @@
 import os
 import sqlite3
 from functools import wraps
+
+from database.db_manager import Database
 from logs.logger_config import logger
 
 
@@ -60,7 +62,10 @@ def create_employee_table(cursor):
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS employees (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(250) NOT NULL,
+    name VARCHAR(250),
+    first_name VARCHAR(250),
+    user_tag VARCHAR(50) NOT NULL,
+    user_id INTEGER,
     password VARCHAR(150),
     position_id INTEGER,
     department_id INTEGER NOT NULL,
@@ -106,19 +111,11 @@ def create_task_history_table(cursor):
     FOREIGN KEY (employee_id) REFERENCES employee(id))''')
 
 
-def create_connection():
-    """Создание соединения с базой данных, если БД не существует, тогда БД создастся."""
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    db_path = os.path.join(project_root, "task.db")
-    conn = sqlite3.connect(db_path)
-    return conn
-
-
 def create_tables():
     """Создание таблиц."""
-    # Создаём соединение с БД
-    with create_connection() as conn:
-        cursor = conn.cursor()
+    db = Database()  # Создаем экземпляр класса Database
+    db.connect()  # Подключаемся к базе данных
+    cursor = db.connection.cursor()  # Получаем курсор из соединения
 
     create_department_table(cursor)
     create_employee_position_table(cursor)
@@ -126,6 +123,8 @@ def create_tables():
     create_employee_table(cursor)
     create_task_table(cursor)
     create_task_history_table(cursor)
+
+    db.close()
 
 
 if __name__ == "__main__":

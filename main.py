@@ -13,6 +13,8 @@ bot = telebot.TeleBot(os.getenv("TOKEN_BOT"))
 def main(message):
     logger.info(f"Команда /start получена от пользователя: {message.chat.id}")
 
+    print(message.from_user.id)
+    print(message.from_user.username)
     # Получаем кнопки
     keyboard = get_buttons_employees_role()
 

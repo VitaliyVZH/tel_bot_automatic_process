@@ -4,9 +4,10 @@ from logs.logger_config import logger
 
 
 class Database:
+    """Класс для доступа к БД."""
     def __init__(self, db_name="task.db"):
         # Получаем путь к корню проекта
-        project_root = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.db_path = os.path.join(project_root, db_name)
         self.connection = None
 
@@ -30,3 +31,4 @@ class Database:
             res = [rol["title"] for rol in cursor.fetchall()]
             logger.info("Получение списка ролей сотрудников из БД.")
             return res
+
