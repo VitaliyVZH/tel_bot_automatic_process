@@ -1,6 +1,7 @@
 from database.db_manager import Database
 from loguru import logger
 
+from validators.email_validation import email_address_verification
 
 # Состояния
 WAITING_FOR_NAME = 'waiting_for_name'
@@ -66,12 +67,15 @@ def register_admin_creation_handler(bot):
         elif state == WAITING_FOR_LAST_NAME:
             user_states[str(message.chat.id) + "_last_name"] = message.text  # Сохраняем фамилию
             user_states[message.chat.id] = WAITING_FOR_EMAIL  # Обновляем состояние
-            bot.send_message(message.chat.id, "Email администратора:")
+            bot.send_message(message.chat.id, "Email администратора (нужно подтвердить):")
 
         elif state == WAITING_FOR_EMAIL:
-            user_states[str(message.chat.id) + "_email"] = message.text  # Сохраняем почту
-            user_states[message.chat.id] = WAITING_FOR_PASSWORD  # Обновляем состояние
-            bot.send_message(message.chat.id, "Пароль администратора:")
+            if email_address_verification(message.text):
+                user_states[str(message.chat.id) + "_email"] = message.text  # Сохраняем почту
+                user_states[message.chat.id] = WAITING_FOR_PASSWORD  # Обновляем состояние
+                bot.send_message(message.chat.id, "Пароль администратора:")
+            else:
+                bot.send_message(message.chat.id, "Введённый email невалиден, повторите ввод:")
 
         elif state == WAITING_FOR_PASSWORD:
             name = user_states[str(message.chat.id) + "_name"]  # Получаем имя из правильного ключа
