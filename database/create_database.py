@@ -63,13 +63,14 @@ def create_employee_table(cursor):
     CREATE TABLE IF NOT EXISTS employees (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(250),
-    first_name VARCHAR(250),
+    last_name VARCHAR(250),
     user_tag VARCHAR(50) NOT NULL,
     user_id INTEGER,
     password VARCHAR(150),
+    email VARCHAR(250) UNIQUE,
     position_id INTEGER,
-    department_id INTEGER NOT NULL,
-    employee_roles_id INTEGER NOT NULL,
+    department_id INTEGER,
+    employee_roles_id INTEGER,
     FOREIGN KEY (position_id) REFERENCES positions(id),
     FOREIGN KEY (department_id) REFERENCES department(id),
     FOREIGN KEY (employee_roles_id) REFERENCES employee_roles(id))
