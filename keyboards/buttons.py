@@ -21,3 +21,14 @@ def get_buttons_employees_role():
         return []
     finally:
         db.close()
+
+
+# def button_delete_last_step(name_step):
+#     """
+#     При регистрации админа, при вводе данных админа, кнопка реализует возможность
+#     вернуться на предыдущий шаг ввода данных.
+#     """
+#     keyboard = types.InlineKeyboardMarkup()
+#     button = types.InlineKeyboardButton(text=name_step, callback_data=name_step)
+#     keyboard.add(button)
+#     return keyboard

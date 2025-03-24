@@ -3,7 +3,7 @@ import telebot
 from dotenv import load_dotenv
 from keyboards.buttons import get_buttons_employees_role
 from logs.logger_config import logger
-from handlers.handlers import register_role_selection_handlers, register_admin_creation_handler
+from handlers.handlers import register_role_selection_handlers
 
 load_dotenv()
 bot = telebot.TeleBot(os.getenv("TOKEN_BOT"))
@@ -22,7 +22,6 @@ def main(message):
 if __name__ == '__main__':
     # Регистрируем обработчики
     register_role_selection_handlers(bot)
-    register_admin_creation_handler(bot)
 
     # Запускаем бота
     try:

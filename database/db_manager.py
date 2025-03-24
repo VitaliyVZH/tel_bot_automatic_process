@@ -54,6 +54,7 @@ class Database:
             return False
 
     def add_administrator(self, name, last_name, user_tag, user_id, password, email) -> bool:
+        """Сохранение администратора в БД"""
         logger.info("Сохранение администратора.")
         self.connect()
 
@@ -71,3 +72,4 @@ class Database:
                 return False
             except Exception as e:
                 logger.error(f"Произошла ошибка: {e}")
+                return False
